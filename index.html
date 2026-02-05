@@ -101,6 +101,7 @@ button {
 <body>
 
 <!-- 🎶 Romantic music -->
+
 <audio id="bgMusic" loop>
     <source src="Sirikkadhey.mp3" type="audio/mpeg">
 </audio>
@@ -126,18 +127,11 @@ const noBtn = document.getElementById("noBtn");
 const message = document.getElementById("message");
 const music = document.getElementById("bgMusic");
 
-let musicStarted = false;
+let yesClicked = false;
 
-/* 🎶 Start music on first interaction */
-document.body.addEventListener("click", () => {
-    if (!musicStarted) {
-        music.play();
-        musicStarted = true;
-    }
-});
+function moveNoButton(x = 0, y = 0) {
+    if (yesClicked) return; // stop caring after YES
 
-/* 😈 Smarter NO button escape */
-function escapeNoButton(x, y) {
     const padding = 20;
     const maxX = window.innerWidth - noBtn.offsetWidth - padding;
     const maxY = window.innerHeight - noBtn.offsetHeight - padding;
@@ -145,36 +139,48 @@ function escapeNoButton(x, y) {
     let newX = Math.random() * maxX;
     let newY = Math.random() * maxY;
 
-    // move away from finger
-    if (Math.abs(newX - x) < 120) newX += 150;
-    if (Math.abs(newY - y) < 120) newY += 150;
+    // Run away from finger/mouse
+    if (Math.abs(newX - x) < 150) newX += 200;
+    if (Math.abs(newY - y) < 150) newY += 200;
 
     noBtn.style.left = Math.min(maxX, Math.max(0, newX)) + "px";
     noBtn.style.top = Math.min(maxY, Math.max(0, newY)) + "px";
     noBtn.style.transform = "none";
 }
 
+/* NO runs on every attempt */
+noBtn.addEventListener("mouseover", e => moveNoButton(e.clientX, e.clientY));
+noBtn.addEventListener("click", e => moveNoButton(e.clientX, e.clientY));
 noBtn.addEventListener("touchstart", e => {
     const t = e.touches[0];
-    escapeNoButton(t.clientX, t.clientY);
+    moveNoButton(t.clientX, t.clientY);
 });
 
-noBtn.addEventListener("mouseover", e => {
-    escapeNoButton(e.clientX, e.clientY);
-});
 
-/* ❤️ YES click effects */
 yesBtn.addEventListener("click", () => {
-    // vibration
+    yesClicked = true;
+
+    // 🎶 Start music
+    music.volume = 0.5;
+    music.play();
+
+    // 📳 Vibration
     if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 
-    // hide buttons
+    // Hide buttons (optional but recommended)
     yesBtn.style.display = "none";
+    noBtn.style.display = "none";
+
+    // Show message
     message.style.display = "block";
 
+    // 🎆 Effects
     confettiExplosion();
     heartExplosion();
 });
+
+
+
 
 /* 🎆 Confetti */
 function confettiExplosion() {
