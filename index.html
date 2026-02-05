@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Be My Valentine ❤️</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #ff758c, #ff7eb3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 360px;
+    position: relative;
+    z-index: 10;
+}
+
+h1 {
+    color: #fff;
+    font-size: 1.9rem;
+    margin-bottom: 30px;
+}
+
+.buttons {
+    position: relative;
+    height: 160px;
+}
+
+button {
+    width: 150px;
+    padding: 14px;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+}
+
+#yesBtn {
+    background: #ff2f68;
+    color: white;
+}
+
+#noBtn {
+    background: white;
+    color: #ff2f68;
+    position: absolute;
+    left: 50%;
+    top: 80px;
+    transform: translateX(-50%);
+}
+
+.message {
+    display: none;
+    margin-top: 25px;
+    font-size: 1.2rem;
+    color: white;
+    line-height: 1.5;
+}
+
+/* Floating hearts */
+.heart {
+    position: absolute;
+    font-size: 22px;
+    animation: floatUp linear infinite;
+    opacity: 0.8;
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(100vh); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateY(-10vh); opacity: 0; }
+}
+
+/* Confetti */
+.confetti {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    animation: fall 3s linear forwards;
+}
+
+@keyframes fall {
+    to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- 🎶 Romantic music -->
+<audio id="bgMusic" loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+</audio>
+
+<div class="container">
+    <h1>Will you be my Valentine? 💘</h1>
+
+    <div class="buttons">
+        <button id="yesBtn">YES ❤️</button>
+        <button id="noBtn">NO 💔</button>
+    </div>
+
+    <div class="message" id="message">
+        I knew you would say YES 😍❤️<br><br>
+        Let’s meet today at<br>
+        <b>Hotel Paradise</b><br>
+        <b>7:00 PM</b> 💕
+    </div>
+</div>
+
+<script>
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const message = document.getElementById("message");
+const music = document.getElementById("bgMusic");
+
+let musicStarted = false;
+
+/* 🎶 Start music on first interaction */
+document.body.addEventListener("click", () => {
+    if (!musicStarted) {
+        music.play();
+        musicStarted = true;
+    }
+});
+
+/* 😈 Smarter NO button escape */
+function escapeNoButton(x, y) {
+    const padding = 20;
+    const maxX = window.innerWidth - noBtn.offsetWidth - padding;
+    const maxY = window.innerHeight - noBtn.offsetHeight - padding;
+
+    let newX = Math.random() * maxX;
+    let newY = Math.random() * maxY;
+
+    // move away from finger
+    if (Math.abs(newX - x) < 120) newX += 150;
+    if (Math.abs(newY - y) < 120) newY += 150;
+
+    noBtn.style.left = Math.min(maxX, Math.max(0, newX)) + "px";
+    noBtn.style.top = Math.min(maxY, Math.max(0, newY)) + "px";
+    noBtn.style.transform = "none";
+}
+
+noBtn.addEventListener("touchstart", e => {
+    const t = e.touches[0];
+    escapeNoButton(t.clientX, t.clientY);
+});
+
+noBtn.addEventListener("mouseover", e => {
+    escapeNoButton(e.clientX, e.clientY);
+});
+
+/* ❤️ YES click effects */
+yesBtn.addEventListener("click", () => {
+    // vibration
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+
+    // hide buttons
+    yesBtn.style.display = "none";
+    noBtn.style.display = "none";
+    message.style.display = "block";
+
+    confettiExplosion();
+    heartExplosion();
+});
+
+/* 🎆 Confetti */
+function confettiExplosion() {
+    for (let i = 0; i < 80; i++) {
+        const confetti = document.createElement("div");
+        confetti.className = "confetti";
+        confetti.style.left = Math.random() * 100 + "vw";
+        confetti.style.top = "-10px";
+        confetti.style.backgroundColor =
+            ["#ff2f68","#fff","#ffd1dc","#ff9aa2"][Math.floor(Math.random()*4)];
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 3000);
+    }
+}
+
+/* 💕 Heart explosion */
+function heartExplosion() {
+    for (let i = 0; i < 25; i++) {
+        const heart = document.createElement("div");
+        heart.innerHTML = "❤️";
+        heart.style.position = "fixed";
+        heart.style.left = "50%";
+        heart.style.top = "50%";
+        heart.style.fontSize = "24px";
+        heart.style.transform = `translate(-50%, -50%) translate(${Math.random()*300-150}px, ${Math.random()*300-150}px)`;
+        heart.style.transition = "2s";
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 2000);
+    }
+}
+
+/* 💕 Floating background hearts */
+setInterval(() => {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.innerHTML = "❤️";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.animationDuration = (Math.random() * 3 + 5) + "s";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 8000);
+}, 700);
+</script>
+
+</body>
+</html>
